@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 import uvicorn
@@ -38,7 +38,7 @@ app.add_middleware(
 # Modèles Pydantic
 class ContactMessage(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     subject: str
     message: str
 
