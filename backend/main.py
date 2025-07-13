@@ -6,19 +6,19 @@ from datetime import datetime
 import uvicorn
 import os
 from dotenv import load_dotenv
-from supabase import create_client, Client
+# from supabase import create_client, Client
 
 # Charger les variables d'environnement
 load_dotenv()
 
-# Configuration Supabase
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
+# Configuration Supabase (temporairement désactivée)
+# SUPABASE_URL = os.getenv("SUPABASE_URL")
+# SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("Les variables SUPABASE_URL et SUPABASE_ANON_KEY doivent être définies")
+# if not SUPABASE_URL or not SUPABASE_KEY:
+#     raise ValueError("Les variables SUPABASE_URL et SUPABASE_ANON_KEY doivent être définies")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = FastAPI(
     title="Portfolio API - Fidel Moussahaziri",
@@ -83,50 +83,56 @@ async def get_projects(
     featured: Optional[bool] = None,
     status: Optional[str] = None
 ):
-    """Récupère les projets avec leurs technologies"""
-    try:
-        # Construction de la requête
-        query = supabase.table("projects").select("""
-            *,
-            project_technologies(
-                technologies(*)
-            )
-        """)
-        
-        # Filtres optionnels
-        if category:
-            query = query.eq("category", category)
-        if featured is not None:
-            query = query.eq("featured", featured)
-        if status:
-            query = query.eq("status", status)
-        
-        # Ordre par featured puis par date de création
-        query = query.order("featured", desc=True).order("created_at", desc=True)
-        
-        result = query.execute()
-        
-        # Transformation des données pour correspondre au modèle Pydantic
-        projects = []
-        for project_data in result.data:
-            # Extraction des technologies
-            technologies = []
-            if project_data.get("project_technologies"):
-                for pt in project_data["project_technologies"]:
-                    if pt.get("technologies"):
-                        tech = pt["technologies"]
-                        technologies.append(Technology(**tech))
-            
-            # Suppression des données de liaison pour éviter les conflits
-            project_clean = {k: v for k, v in project_data.items() if k != "project_technologies"}
-            project_clean["technologies"] = technologies
-            
-            projects.append(Project(**project_clean))
-        
-        return projects
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erreur lors de la récupération des projets: {str(e)}")
+    """Récupère les projets avec leurs technologies (données mock temporaires)"""
+    # Données mock temporaires
+    mock_projects = [
+        {
+            "id": 1,
+            "title": "Portfolio Personnel",
+            "description": "Portfolio moderne avec animations et backend API",
+            "status": "completed",
+            "featured": True,
+            "category": "fullstack",
+            "demo_url": None,
+            "github_url": "https://github.com/fidel/portfolio",
+            "image_url": None,
+            "technologies": [
+                {"id": 1, "name": "React", "color": "#61dafb"},
+                {"id": 2, "name": "Next.js", "color": "#000000"},
+                {"id": 3, "name": "FastAPI", "color": "#009688"}
+            ],
+            "created_at": datetime.now(),
+            "updated_at": datetime.now()
+        },
+        {
+            "id": 2,
+            "title": "Analyse de Données",
+            "description": "Projet d'analyse de données avec visualisations",
+            "status": "completed",
+            "featured": True,
+            "category": "data",
+            "demo_url": None,
+            "github_url": "https://github.com/fidel/data-analysis",
+            "image_url": None,
+            "technologies": [
+                {"id": 5, "name": "Python", "color": "#3776ab"},
+                {"id": 6, "name": "Pandas", "color": "#150458"}
+            ],
+            "created_at": datetime.now(),
+            "updated_at": datetime.now()
+        }
+    ]
+    
+    # Filtrage simple
+    filtered = mock_projects
+    if featured is not None:
+        filtered = [p for p in filtered if p["featured"] == featured]
+    if category:
+        filtered = [p for p in filtered if p["category"] == category]
+    if status:
+        filtered = [p for p in filtered if p["status"] == status]
+    
+    return filtered
 
 @app.get("/api/projects/featured", response_model=List[Project])
 async def get_featured_projects():
