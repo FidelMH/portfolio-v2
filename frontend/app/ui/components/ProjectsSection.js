@@ -128,7 +128,7 @@ const ProjectsSection = () => {
 
   useEffect(() => {
     fetchProjects();
-  }, [filter, showAll, fetchProjects]);
+  }, [filter, showAll]);
 
   useEffect(() => {
     fetchCategories();
