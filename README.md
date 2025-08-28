@@ -113,7 +113,6 @@ npm run dev
 **Fidel Moussahaziri**
 - Email: moussahaziri.fidel@gmail.com
 - Formation: Développeur en Intelligence Artificielle (Simplon)
-- LinkedIn: [Votre profil]
 
 ## 📄 Licence
 
